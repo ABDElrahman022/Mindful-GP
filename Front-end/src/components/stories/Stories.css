@@ -1,0 +1,60 @@
+.header-text {
+    text-align: left; /* محاذاة النص إلى اليسار */
+    padding: 40px 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+   
+  }
+  
+  .header-text p {
+    font-size: 1.8rem;
+    line-height: 1.6;
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: none; /* إلغاء تحويل النص إلى أحرف كبيرة */
+    margin: 0; /* إزالة التباعد العلوي والسفلي */
+  }
+  /* Custom Form Styles */
+section {
+    max-width: 90%;
+    margin: 2rem auto;
+    padding: 30px;
+  }
+  
+  .form-group textarea {
+    font-size: 1.1rem;
+    border-radius: 22px;
+    transition: all 0.3s ease;
+    resize: vertical; /* Allows vertical resize only */
+    height: 200px;
+    box-shadow: 0 0 8px rgba(252, 255, 252, 0.2);
+  }
+  
+  .form-group textarea:focus {
+    border-color: #325343;
+    box-shadow: 0 0 8px rgba(252, 255, 252, 0.2);
+    background-color: #f8fff9;
+  }
+  
+  .btn-success {
+    letter-spacing: 2px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    section {
+      padding: 15px;
+      margin: 1rem auto;
+    }
+    
+    .form-group textarea {
+      font-size: 2rem;
+      min-height: 500px;
+    }
+  }
