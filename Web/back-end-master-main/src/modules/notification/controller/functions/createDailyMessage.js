@@ -4,7 +4,7 @@ const DailyMessage = require('../../model/notification.model');
 const messages = require('../massages');
 
 const sendDailyMessage = () => {
-    cron.schedule('0 9 * * *', async () => { // */5 * * * * * for Sending every 5 Sec
+    cron.schedule('0 9 * * *', async () =>  { // */5 * * * * * for Sending every 5 Sec
         try {
             const randomIndex = Math.floor(Math.random() * messages.length);
             const selectedMessage = messages[randomIndex];

@@ -21,7 +21,10 @@ const notificationRoutes = require("../modules/notification/router/notification.
 
 // App Initialization
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',  // اسمح فقط للفرونت React
+    credentials: true,  // اسمح بتمرير الكوكيز مع الطلبات
+}));
 
 // Connect to MongoDB
 dbConnect();
