@@ -1,163 +1,130 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../advices&articles/Advices&Articles.css';
 import advices_and_articles from '../../images/advices&articles.png';
-
 function AdvicesAndArticles() {
   const navigate = useNavigate();
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [articles, setArticles] = useState([]);
 
-    return (
-      <div>
-        <div className="container mt-5">
-          {/*Upper text*/}
-          <div className="row align-items-center mb-5">
+  useEffect(() => {
+    const storedArticles = JSON.parse(localStorage.getItem('customArticles')) || [];
+    setArticles(storedArticles);
+  }, []);
 
-          <div className="col-lg-8 col-md-12 text-center text-lg-start">
-            <p className="fw-bold text-success fs-2">
-              Mental health...is not a destination, but a process. It’s about how you drive, not where you're going.
-            </p>
-          </div>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title || !content) return;
 
-          <div className="col-lg-4 col-md-12 text-center mt-4 mt-lg-0">
-            <img
-              src={advices_and_articles}
-              alt="Advices and articles image"
-              className="img-fluid"
-              style={{ maxHeight: '400px' }} 
-            />
-          </div>
+    const newArticle = { title, content };
+    const updatedArticles = [newArticle, ...articles];
+    setArticles(updatedArticles);
+    localStorage.setItem('customArticles', JSON.stringify(updatedArticles));
+    setTitle('');
+    setContent('');
+  };
+
+  const handleDelete = (index) => {
+    const updated = [...articles];
+    updated.splice(index, 1);
+    setArticles(updated);
+    localStorage.setItem('customArticles', JSON.stringify(updated));
+  };
+
+  const goToDetails = (article) => {
+    localStorage.setItem('currentArticle', JSON.stringify(article));
+    navigate('/article-details');
+  };
+
+  const staticArticles = [
+    { title: 'Depression', path: 'Depression', text: 'Ever felt like life has lost its color? Depression is more than just sadness—it’s a deep emotional struggle that affects energy, motivation, and even physical health.' },
+    { title: 'Anxiety Disorders', path: 'AnxietyDisorders', text: 'Heart racing, sweating, endless thoughts? Anxiety goes beyond stress, making tasks overwhelming.' },
+    { title: 'Schizophrenia', path: 'Schizophrenia', text: 'Imagine hearing voices no one else can. Schizophrenia affects perception and reality, not "madness".' },
+    { title: 'Bipolar Disorder', path: 'BipolarDisorder', text: 'From euphoria to despair, bipolar disorder causes intense mood swings disrupting life.' },
+    { title: 'OCD', path: 'OCD', text: 'Checking the door ten times? OCD traps the mind in repetitive, exhausting loops.' },
+    { title: 'PTSD', path: 'PTSD', text: 'Some memories never fade. PTSD keeps past traumas alive, but healing is possible.' },
+    { title: 'Eating Disorders', path: 'EatingDisorders', text: 'Food is not just nutrition—it’s a battle. Anorexia and bulimia reflect deep emotional struggles.' },
+    { title: 'BPD', path: 'BPD', text: 'One moment, love feels overwhelming; the next, it turns into hate. BPD causes intense emotional instability.' },
+    { title: 'ADHD', path: 'ADHD', text: 'Constantly moving, easily distracted—ADHD isn’t just being hyperactive. It affects focus and impulse control.' }
+  ];
+
+  return (
+    <div className="container mt-5">
+      <div className="row align-items-center mb-5">
+        <div className="col-lg-8 text-center text-lg-start">
+          <p className="fw-bold text-success fs-2">
+          Mental health…is not a destination, but a process. It's about how you drive, not where you're going.          </p>
         </div>
-        <h3 className='text-success text-center mb-5'>Write new article</h3>
-        <div className="form-group mb-5">
-              <label htmlFor="title" className="form-label text-success ms-5 fw-bold fs-5">Title :</label>
-              <input
-                type="text"
-                id="title"
-                className="form-control rounded-3"
-                placeholder=""
-              />
-            </div>
-            <div className="form-group mb-4">
-              <label htmlFor="article" className="form-label text-success ms-5 fs-5 fw-bold">Content of article</label>
-              <textarea
-                id="article"
-                rows="4"
-                className="form-control bg-light"
-                placeholder="Write your article here ..."
-              ></textarea>
-            </div>
-            <div className="text-center mb-5 mt-5">
-              <button type="submit" className="btn btn-success rounded-pill px-5 py-2 fw-bold">Send</button>
-            </div>
-        <div className="row g-4 justify-content-center mb-5 mt-5">
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">Depression</h5>
-                <p className="card-text">
-                Ever felt like life has lost its color? Depression is more than just sadness—it’s a deep emotional struggle that affects energy, motivation, and even physical health. How can one find hope again?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/Depression')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">Anxiety Disorders</h5>
-                <p className="card-text">
-                Heart racing, sweating, thoughts that never stop… Sound familiar? Anxiety disorders go beyond everyday stress, making even simple tasks feel overwhelming. How can we regain control?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/AnxietyDisorders')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">Schizophrenia</h5>
-                <p className="card-text">
-                Imagine hearing voices no one else can hear. Schizophrenia is often misunderstood—it’s not "madness" but a complex disorder affecting perception and reality. What’s life like for those who have it?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/Schizophrenia')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">Bipolar Disorder</h5>
-                <p className="card-text">
-                From extreme euphoria to deep despair, bipolar disorder causes intense mood swings that can disrupt daily life. What triggers these shifts, and how can they be managed?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/BipolarDisorder')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">OCD</h5>
-                <p className="card-text">
-                Ever felt the need to check the door ten times before leaving? OCD traps the mind in repetitive thoughts and actions that can be exhausting. Is there a way to break free?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/OCD')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">PTSD</h5>
-                <p className="card-text">
-                Some memories refuse to fade, replaying like a nightmare in real life. PTSD keeps past traumas alive, but can healing and recovery be possible?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/PTSD')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">Eating Disorders</h5>
-                <p className="card-text">
-                For some, food is not just nutrition—it’s a battle. Disorders like anorexia and bulimia stem from deep emotional struggles. How can one develop a healthy relationship with food?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/EatingDisorders')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">BPD</h5>
-                <p className="card-text">
-                One moment, love feels overwhelming; the next, it turns into hate. BPD causes intense emotional instability and difficulty in relationships. What’s behind these extreme feelings?                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/BPD')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 col-sm-6">
-            <div className="card p-3 shadow h-100 rounded-5">
-              <div className="card-body d-flex flex-column justify-content-between">
-                <h5 className="card-title text-success fw-bold text-center mb-4">ADHD</h5>
-                <p className="card-text">
-                Constantly moving, easily distracted—ADHD isn’t just about being "hyper." It affects focus, impulse control, and daily life, but it doesn’t have to hold anyone back.                </p>
-                <button className="btn btn-success rounded-pill px-4 py-3 fw-bold mt-5"
-                onClick={() => navigate('/mental_disorders/ADHD')}>MORE</button>
-              </div>
-            </div>
-          </div>
-          </div>
-  
-        
+        <div className="col-lg-4 text-center">
+          <img src={advices_and_articles} alt="advices" className="img-fluid" style={{ maxHeight: '400px' }} />
         </div>
-  
-    
       </div>
-    );
-  }
-  
-  export default AdvicesAndArticles;
+
+      <h3 className="text-success text-center mb-5">Write new article</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group mb-3">
+          <label className="form-label text-success ms-2 fw-bold">Title :</label>
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="form-control rounded-3" />
+        </div>
+        <div className="form-group mb-4">
+          <label className="form-label text-success ms-2 fw-bold">Content of article</label>
+          <textarea rows="4" value={content} onChange={(e) => setContent(e.target.value)} className="form-control bg-light" placeholder="Write your article here ..." />
+        </div>
+        <div className="text-center mb-5 mt-3">
+          <button type="submit" className="btn btn-success rounded-pill px-5 py-2 fw-bold">Send</button>
+        </div>
+      </form>
+
+      <div className="row g-4 justify-content-center mb-5">
+        {articles.map((item, index) => (
+          <div className="col-md-4 col-sm-6" key={index}>
+            <div className="card p-3 shadow h-100 rounded-5">
+              <div className="card-body d-flex flex-column justify-content-between">
+                <h5 className="card-title text-success fw-bold text-center mb-3">{item.title}</h5>
+                <p
+                  className="card-text"
+                  style={{
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical'
+                  }}
+                >
+                  {item.content}
+                </p>
+                <button
+                  className="btn btn-success rounded-pill px-4 py-2 fw-bold mt-2"
+                  onClick={() => goToDetails(item)}
+                >
+                  MORE
+                </button>
+                <button className="btn btn-danger mt-3 fw-bold rounded-pill" onClick={() => handleDelete(index)}>Delete</button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {staticArticles.map((item, index) => (
+          <div className="col-md-4 col-sm-6" key={`static-${index}`}>
+            <div className="card p-3 shadow h-100 rounded-5">
+              <div className="card-body d-flex flex-column justify-content-between">
+                <h5 className="card-title text-success fw-bold text-center mb-3">{item.title}</h5>
+                <p className="card-text">{item.text}</p>
+                <button
+                  className="btn btn-success rounded-pill px-4 py-2 fw-bold mt-3"
+                  onClick={() => navigate(`/mental_disorders/${item.path}`)}
+                >
+                  MORE
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default AdvicesAndArticles;

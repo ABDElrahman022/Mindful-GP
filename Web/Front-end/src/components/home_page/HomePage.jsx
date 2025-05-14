@@ -10,19 +10,39 @@ import therapist from '../../images/therapists.png';
 
 function HomePage() {
   const navigate = useNavigate();
-  const [comment, setComment] = useState('');
-  const [submissionStatus, setSubmissionStatus] = useState('');
+  const [message, setMessage] = useState("");
+  const [statusMsg, setStatusMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Added state for loading
+  const [contacts, setContacts] = useState([]); // Added state for contacts
+
+  // دالة للحصول على التوكن من الكوكيز
+  const getCookie = (name) => {
+    return document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(name + "="))
+      ?.split("=")[1] || null;
+  };
 
   useEffect(() => {
     const fetchContacts = async () => {
       setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn('No token, cannot fetch contacts');
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await fetch('http://localhost:4000/api/v1/contact');
+        // تعديل الرابط ليطابق ما في الباك
+        const response = await fetch('http://localhost:4000/api/v1/contact', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
-        setContacts(data);
+        const list = Array.isArray(data) ? data : data.contacts || [];
+        setContacts(list);
       } catch (error) {
         console.error('Error fetching contacts:', error);
       } finally {
@@ -36,38 +56,35 @@ function HomePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmissionStatus('');
+    setStatusMsg("");
 
     const token = localStorage.getItem('token');
     if (!token) {
-      setSubmissionStatus('You must be logged in to send a message.');
+      setStatusMsg("You must be logged in to send a message.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:4000/api/v1/contact/create', {
-        method: 'POST',
+      const res = await fetch("http://localhost:4000/api/v1/contact/create", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ comment }),
+        body: JSON.stringify({ massage: message }), // ← تم تعديل المفتاح هنا
       });
+      const data = await res.json();
 
-      const data = await response.json();
-      console.log('Response:', data);
-      console.log('Response Data:', data);
-
-      if (response.ok) {
-        setSubmissionStatus('Your message has been sent successfully!');
-        setComment('');
-        localStorage.setItem('token', data.token);
+      if (res.ok) {
+        setStatusMsg("sent successfully!");
+        setMessage("");
       } else {
-        setSubmissionStatus(data.message || 'Failed to send your message.');
+        setStatusMsg(data.message || "فشل في الإرسال.");
       }
-    } catch (error) {
-      setSubmissionStatus('An error occurred. Please try again later.');
+    } catch (err) {
+      console.error("خطأ في الإرسال:", err);
+      setStatusMsg("حصل خطأ. حاول مرة أخرى لاحقاً.");
     } finally {
       setIsSubmitting(false);
     }
@@ -194,12 +211,15 @@ function HomePage() {
       {/* Contact Form Section */}
       <section className="mt-5">
         <h2 className="text-success text-center fw-bold mb-4">Contact Us</h2>
-        <form className="d-flex flex-column align-items-center" onSubmit={handleSubmit}>
+        <form
+          className="d-flex flex-column align-items-center"
+          onSubmit={handleSubmit}
+        >
           <textarea
             className="form-control mb-3 w-50"
             placeholder="Your message..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             required
           />
           <button
@@ -209,12 +229,31 @@ function HomePage() {
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </button>
-          {submissionStatus && (
-            <div className="mt-3 text-center text-info">
-              {submissionStatus}
+          {statusMsg && (
+            <div
+              className={`mt-3 text-center ${
+                statusMsg.includes('نجاح') ? 'text-success' : 'text-danger'
+              }`}
+            >
+              {statusMsg}
             </div>
           )}
         </form>
+      </section>
+
+      {/* Display fetched contacts */}
+      <section className="mt-5">
+        {loading ? (
+          <p>Loading...</p>
+        ) : contacts.length > 0 && (
+          <ul className="list-group w-50 mx-auto">
+            {contacts.map((c) => (
+              <li key={c._id} className="list-group-item">
+                {c.message}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );

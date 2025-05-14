@@ -1,17 +1,34 @@
 .navbar {
-    height: 80px; 
-    display: flex;
-    align-items: center; 
-    margin-top: 2%;
-    margin-bottom: 5%;
-  }
-  .navbar-logo {
-    height: 300px; 
-    width: auto;  
-  }
-  a{
-    color: #325343 !important;
-  }
-.image{
+  height: 80px;
+  display: flex;
+  align-items: center;
+  margin-top: 2%;
+  margin-bottom: 5%;
+}
+.navbar-logo {
+  height: 300px;
+  width: auto;
+}
+a {
+  color: #325343 !important;
+}
+.image {
   margin-right: 20%;
+}
+.bi-bell-fill {
+  color: #325343; /* نفس لون زر Logout */
+}
+/* تغيير لون السهم بجانب الجرس */
+.dropdown-toggle::after {
+  color: #325343; /* نفس لون زر Logout */
+}
+
+/* تغيير لون زر X إلى اللون الرمادي */
+.btn-danger {
+  background-color: #6c757d !important; /* اللون الرمادي */
+  border-color: #6c757d !important; /* اللون الرمادي */
+}
+.btn-danger:hover {
+  background-color: #5a6268 !important; /* لون أغمق عند التمرير */
+  border-color: #545b62 !important;
 }

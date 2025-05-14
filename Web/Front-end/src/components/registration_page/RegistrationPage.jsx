@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Cookies from 'js-cookie';
 
 function RegistrationPage() {
   const [isDoctor, setIsDoctor] = useState(false);
@@ -9,7 +10,7 @@ function RegistrationPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    certificate: null, // صورة الشهادة
+    certificate: null, // ملف الشهادة
   });
   const navigate = useNavigate();
 
@@ -29,24 +30,22 @@ function RegistrationPage() {
       return;
     }
 
-    let endpoint = isDoctor
-      ? "http://localhost:4000/api/v1/facultyMember/register"
-      : "http://localhost:4000/api/v1/auth/register";
+    const endpoint = isDoctor
+      ? "http://localhost:4000/api/v1/auth/register/doctor"
+      : "http://localhost:4000/api/v1/auth/register/user";
 
     let body;
     let headers = {};
 
     if (isDoctor) {
-      // استخدم FormData لإرسال الصورة
       body = new FormData();
       body.append("name", formData.name);
       body.append("email", formData.email);
       body.append("password", formData.password);
       body.append("confirmPassword", formData.confirmPassword);
       if (formData.certificate) {
-        body.append("certificate", formData.certificate);
+        body.append("image", formData.certificate); // لازم يتطابق اسم الحقل مع الباك اند
       }
-      // لا تضع Content-Type هنا، المتصفح يضبطها تلقائياً مع FormData
     } else {
       body = JSON.stringify({
         name: formData.name,
@@ -62,11 +61,20 @@ function RegistrationPage() {
         method: "POST",
         headers,
         body,
+        credentials: 'include', // This is important for cookies
       });
 
       const result = await response.json();
 
+      console.log("Response:", response);
+      console.log("Result:", result);
+
       if (response.ok) {
+        // Save token to cookies
+        if (result.token) {
+          Cookies.set('token', result.token, { expires: 7 }); // Token expires in 7 days
+        }
+        
         alert("Registration successful!");
         navigate("/login_page");
       } else if (result.errors && result.errors.length > 0) {
@@ -86,12 +94,12 @@ function RegistrationPage() {
     <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
       <div className="row w-100 mx-3">
         {/* Sidebar Section */}
-        <div className="col-lg-5 text-success p-4 rounded-start text-center">
+        <div className="col-lg-5 text-success p-4 rounded-start text-center bg-light">
           <h1 className="display-4 fw-bold mb-5">Welcome!</h1>
           <ul className="nav flex-column">
             <li className="nav-item">
               <button
-                className={`btn btn-link text-success ${!isDoctor ? "active" : ""}`}
+                className={`btn btn-link text-success ${!isDoctor ? "fw-bold" : ""}`}
                 onClick={() => setIsDoctor(false)}
               >
                 User
@@ -99,7 +107,7 @@ function RegistrationPage() {
             </li>
             <li className="nav-item">
               <button
-                className={`btn btn-link text-success ${isDoctor ? "active" : ""}`}
+                className={`btn btn-link text-success ${isDoctor ? "fw-bold" : ""}`}
                 onClick={() => setIsDoctor(true)}
               >
                 Doctor
@@ -160,7 +168,7 @@ function RegistrationPage() {
             </div>
             {isDoctor && (
               <div className="mb-3">
-                <label className="form-label text-light">Certificate (PDF or Image)</label>
+                <label className="form-label text-light">Certificate (Image/PDF)</label>
                 <input
                   type="file"
                   className="form-control"

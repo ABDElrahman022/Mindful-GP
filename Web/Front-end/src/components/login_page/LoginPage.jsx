@@ -1,14 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useNavigate } from "react-router-dom";
-import "./LoginPage.css";
+import { Link } from "react-router-dom";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
@@ -17,28 +26,27 @@ function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (response.ok) {
-        console.log("Token:", data.token);
-
-        // حفظ الـ token في الكوكيز مع تاريخ انتهاء
-        const token = data.token;
-        const expirationDate = new Date();
-        expirationDate.setTime(expirationDate.getTime() + 24 * 60 * 60 * 1000); // 24 ساعة
-
-        document.cookie = `token=${token}; expires=${expirationDate.toUTCString()}; path=/; SameSite=Strict`;
-
+        if (result.token) {
+          localStorage.setItem('token', result.token);
+        }
+        if (result.user && result.user.handle) {
+          console.log('HANDLE FROM LOGIN:', result.user.handle);
+          localStorage.setItem('handle', result.user.handle);
+        }
+        console.log('HANDLE FROM LOCALSTORAGE:', localStorage.getItem('handle'));
         alert("Login successful!");
-        navigate("/"); // توجيه المستخدم إلى الصفحة الرئيسية
+        navigate("/");
       } else {
-        alert(data.message || "Login failed");
+        alert(result.message || "Login failed. Please check your credentials.");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Error:", error);
       alert("An error occurred during login.");
     }
   };
@@ -46,38 +54,35 @@ function LoginPage() {
   return (
     <div className="container-fluid vh-100 d-flex align-items-center justify-content-center">
       <div className="row w-100 mx-3">
-        {/* Welcome Section */}
         <div className="col-lg-6 d-flex align-items-center justify-content-center text-success text-center py-5">
           <div>
             <h1 className="display-4 fw-bold">Welcome!</h1>
             <p className="lead mt-4">We are excited to have you back!</p>
           </div>
         </div>
-
-        {/* Login Form Section */}
         <div className="col-lg-6 d-flex justify-content-center">
           <div className="py-5 shadow-sm col-lg-8 bg-success rounded-5">
             <h2 className="text-light text-center mb-5">Login</h2>
-            <form className="px-4" onSubmit={handleLogin}>
+            <form className="px-4" onSubmit={handleSubmit}>
               <div className="mb-4">
                 <input
                   type="email"
-                  id="email"
                   className="form-control"
                   placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   required
                 />
               </div>
               <div className="mb-4">
                 <input
                   type="password"
-                  id="password"
                   className="form-control"
                   placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   required
                 />
               </div>
