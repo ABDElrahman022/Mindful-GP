@@ -8,10 +8,20 @@ function AdvicesAndArticles() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [articles, setArticles] = useState([]);
-
+ const [user, setUser] = useState([]);
   useEffect(() => {
+    
+  }, []);
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    console.log('Stored user:', storedUser);
     const storedArticles = JSON.parse(localStorage.getItem('customArticles')) || [];
     setArticles(storedArticles);
+    if (storedUser) {
+      setUser(storedUser);
+    
+     
+    }
   }, []);
 
   const handleSubmit = (e) => {
@@ -55,15 +65,15 @@ function AdvicesAndArticles() {
       <div className="row align-items-center mb-5">
         <div className="col-lg-8 text-center text-lg-start">
           <p className="fw-bold text-success fs-2">
-          Mental health…is not a destination, but a process. It's about how you drive, not where you're going.          </p>
+          Mental health…is not a destination, but a process. It's about how you drive, not where you're going.          </p>
         </div>
         <div className="col-lg-4 text-center">
           <img src={advices_and_articles} alt="advices" className="img-fluid" style={{ maxHeight: '400px' }} />
         </div>
       </div>
 
-      <h3 className="text-success text-center mb-5">Write new article</h3>
-      <form onSubmit={handleSubmit}>
+      {user==="doctor"&&<h3 className="text-success text-center mb-5">Write new article</h3>}
+      {user==="doctor"&&<form onSubmit={handleSubmit}>
         <div className="form-group mb-3">
           <label className="form-label text-success ms-2 fw-bold">Title :</label>
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="form-control rounded-3" />
@@ -75,7 +85,7 @@ function AdvicesAndArticles() {
         <div className="text-center mb-5 mt-3">
           <button type="submit" className="btn btn-success rounded-pill px-5 py-2 fw-bold">Send</button>
         </div>
-      </form>
+      </form>}
 
       <div className="row g-4 justify-content-center mb-5">
         {articles.map((item, index) => (
@@ -107,14 +117,14 @@ function AdvicesAndArticles() {
         ))}
 
         {staticArticles.map((item, index) => (
-          <div className="col-md-4 col-sm-6" key={`static-${index}`}>
+          <div className="col-md-4 col-sm-6" key={static-${index}}>
             <div className="card p-3 shadow h-100 rounded-5">
               <div className="card-body d-flex flex-column justify-content-between">
                 <h5 className="card-title text-success fw-bold text-center mb-3">{item.title}</h5>
                 <p className="card-text">{item.text}</p>
                 <button
                   className="btn btn-success rounded-pill px-4 py-2 fw-bold mt-3"
-                  onClick={() => navigate(`/mental_disorders/${item.path}`)}
+                  onClick={() => navigate(/mental_disorders/${item.path})}
                 >
                   MORE
                 </button>
